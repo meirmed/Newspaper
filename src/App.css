@@ -1,0 +1,96 @@
+.app {
+  min-height: 100vh;
+  background: var(--paper);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+.lang-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 100;
+  display: flex;
+  gap: 4px;
+  background: rgba(245, 240, 232, 0.92);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 3px;
+  backdrop-filter: blur(8px);
+}
+
+.lang-toggle button {
+  border: none;
+  background: transparent;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  color: var(--ink-muted);
+  transition: all 0.15s;
+}
+
+.lang-toggle button.active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 1.2rem;
+  padding: 2rem;
+}
+
+.press-anim {
+  display: flex;
+  gap: 5px;
+  align-items: flex-end;
+}
+
+.bar {
+  width: 7px;
+  background: var(--ink-muted);
+  border-radius: 2px;
+  animation: pressAnim 1.2s ease-in-out infinite;
+}
+
+@keyframes pressAnim {
+  0%, 100% { opacity: 0.25; transform: scaleY(0.5); }
+  50% { opacity: 1; transform: scaleY(1); }
+}
+
+.loading-text {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 1.2rem;
+  color: var(--ink);
+}
+
+.loading-sub {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+.back-btn {
+  display: block;
+  margin: 1rem auto 0;
+  background: none;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0.5rem 1.2rem;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  transition: all 0.15s;
+}
+
+.back-btn:hover {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}

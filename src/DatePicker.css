@@ -1,0 +1,112 @@
+.picker-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+.picker-card {
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+}
+
+.nameplate-en {
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: clamp(2rem, 10vw, 3.2rem);
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: 0.15rem;
+}
+
+.nameplate-he {
+  font-family: 'Frank Ruhl Libre', serif;
+  font-weight: 900;
+  font-size: clamp(1.2rem, 5vw, 1.8rem);
+  color: var(--ink);
+  line-height: 1.2;
+  margin-bottom: 0.15rem;
+}
+
+.tagline {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
+
+.thick-rule {
+  border: none;
+  border-top: 4px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  height: 6px;
+  margin: 0.6rem 0 1.2rem;
+}
+
+.intro {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--ink-muted);
+  line-height: 1.6;
+  margin-bottom: 1.8rem;
+}
+
+.picker-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.date-input {
+  width: 100%;
+  max-width: 280px;
+  padding: 0.75rem 1rem;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1rem;
+  border: 1.5px solid var(--rule);
+  border-radius: 3px;
+  background: white;
+  color: var(--ink);
+  text-align: center;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: var(--ink);
+}
+
+.print-btn {
+  width: 100%;
+  max-width: 280px;
+  padding: 0.85rem 2rem;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  border-radius: 3px;
+  transition: opacity 0.2s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.print-btn:active {
+  transform: scale(0.97);
+  opacity: 0.85;
+}
+
+.error-msg {
+  margin-top: 1rem;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-style: italic;
+}

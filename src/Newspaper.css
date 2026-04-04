@@ -1,0 +1,275 @@
+.np {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 3rem;
+  font-family: 'Libre Baskerville', serif;
+  background: var(--paper);
+}
+
+.np.rtl { direction: rtl; }
+.np.ltr { direction: ltr; }
+
+.dateline {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Heebo', 'Libre Baskerville', sans-serif;
+  font-size: 0.68rem;
+  color: var(--ink-muted);
+  letter-spacing: 0.5px;
+  padding-bottom: 0.4rem;
+  border-bottom: 0.5px solid var(--rule);
+  margin-bottom: 0.4rem;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.nameplate-en {
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: clamp(2rem, 8vw, 4rem);
+  text-align: center;
+  color: var(--ink);
+  line-height: 1;
+  padding: 0.2rem 0;
+}
+
+.nameplate-he {
+  font-family: 'Frank Ruhl Libre', serif;
+  font-weight: 900;
+  font-size: clamp(1.3rem, 5vw, 2.4rem);
+  text-align: center;
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+.np-tagline {
+  text-align: center;
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  letter-spacing: 1px;
+  margin-bottom: 0.3rem;
+}
+
+.thick-rule {
+  border: none;
+  border-top: 4px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  height: 6px;
+  margin: 0.4rem 0 1rem;
+}
+
+.main-hed {
+  font-family: 'Playfair Display', 'Frank Ruhl Libre', serif;
+  font-weight: 900;
+  font-size: clamp(1.4rem, 4.5vw, 2.5rem);
+  line-height: 1.15;
+  text-align: center;
+  color: var(--ink);
+  margin-bottom: 0.6rem;
+}
+
+.main-deck {
+  font-family: 'Playfair Display', 'Frank Ruhl Libre', serif;
+  font-style: italic;
+  font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+  text-align: center;
+  color: var(--ink-muted);
+  line-height: 1.55;
+  max-width: 620px;
+  margin: 0 auto 0.9rem;
+}
+
+.main-body {
+  font-family: 'IM Fell English', 'Frank Ruhl Libre', serif;
+  font-size: clamp(0.88rem, 2vw, 0.95rem);
+  line-height: 1.85;
+  color: var(--ink);
+  padding: 0.75rem 0;
+  border-top: 0.5px solid var(--rule);
+  border-bottom: 0.5px solid var(--rule);
+  margin-bottom: 0.75rem;
+  column-count: 2;
+  column-gap: 2rem;
+}
+
+.cols3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 0.5px solid var(--rule);
+  margin-bottom: 0.5rem;
+}
+
+.col {
+  padding: 0.85rem 0.9rem;
+}
+
+.col:first-child { padding-left: 0; }
+.col:last-child { padding-right: 0; }
+
+.rtl .col:first-child { padding-left: 0.9rem; padding-right: 0; }
+.rtl .col:last-child { padding-right: 0.9rem; padding-left: 0; }
+
+.col + .col { border-left: 0.5px solid var(--rule); }
+.rtl .col + .col { border-left: none; border-right: 0.5px solid var(--rule); }
+
+.col-tag {
+  display: inline-block;
+  font-family: 'Heebo', 'Libre Baskerville', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 1px 6px;
+  margin-bottom: 0.3rem;
+}
+
+.col-hed {
+  font-family: 'Playfair Display', 'Frank Ruhl Libre', serif;
+  font-weight: 700;
+  font-size: clamp(0.88rem, 2vw, 1rem);
+  line-height: 1.3;
+  color: var(--ink);
+  border-bottom: 0.5px solid var(--rule);
+  padding-bottom: 0.3rem;
+  margin-bottom: 0.35rem;
+}
+
+.col-body {
+  font-family: 'IM Fell English', 'Frank Ruhl Libre', serif;
+  font-size: clamp(0.8rem, 1.8vw, 0.87rem);
+  line-height: 1.72;
+  color: var(--ink);
+}
+
+.bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  border-top: 2px solid var(--ink);
+  margin-top: 0.5rem;
+}
+
+.bcol {
+  padding: 0.85rem 0.9rem;
+}
+
+.bcol:first-child { padding-left: 0; }
+.bcol:last-child { padding-right: 0; }
+
+.rtl .bcol:first-child { padding-left: 0.9rem; padding-right: 0; }
+.rtl .bcol:last-child { padding-right: 0.9rem; padding-left: 0; }
+
+.bcol + .bcol { border-left: 0.5px solid var(--rule); }
+.rtl .bcol + .bcol { border-left: none; border-right: 0.5px solid var(--rule); }
+
+.sec-label {
+  font-family: 'Heebo', 'Libre Baskerville', sans-serif;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 0.3rem;
+  margin-bottom: 0.65rem;
+  color: var(--ink);
+}
+
+.curi {
+  padding: 0.4rem 0;
+  border-bottom: 1px dotted var(--rule);
+}
+
+.curi:last-child { border-bottom: none; }
+
+.curi-title {
+  font-family: 'Playfair Display', 'Frank Ruhl Libre', serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--ink);
+  margin-bottom: 0.12rem;
+}
+
+.curi-body {
+  font-family: 'Heebo', 'IM Fell English', serif;
+  font-size: 0.78rem;
+  line-height: 1.58;
+  color: var(--ink-muted);
+}
+
+.born-list {
+  list-style: none;
+  padding: 0;
+}
+
+.born-list li {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  padding: 0.28rem 0;
+  border-bottom: 1px dotted var(--rule);
+  font-family: 'Frank Ruhl Libre', 'IM Fell English', serif;
+  font-size: 0.82rem;
+  color: var(--ink);
+  flex-wrap: wrap;
+}
+
+.born-list li:last-child { border-bottom: none; }
+
+.born-list em {
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+}
+
+.born-year {
+  font-family: 'Libre Baskerville', sans-serif;
+  font-weight: 700;
+  font-size: 0.65rem;
+  color: var(--ink-muted);
+  min-width: 30px;
+  direction: ltr;
+}
+
+.foot-rule {
+  border: none;
+  border-top: 3px double var(--ink);
+  margin: 1.5rem 0 0.5rem;
+}
+
+.foot-txt {
+  text-align: center;
+  font-family: 'IM Fell English', serif;
+  font-size: 0.68rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.5px;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .np { padding: 1rem 1rem 2rem; }
+
+  .main-body { column-count: 1; }
+
+  .cols3 {
+    grid-template-columns: 1fr;
+  }
+  .col { padding: 0.75rem 0 !important; }
+  .col + .col {
+    border-left: none !important;
+    border-right: none !important;
+    border-top: 0.5px solid var(--rule);
+  }
+
+  .bottom {
+    grid-template-columns: 1fr;
+  }
+  .bcol { padding: 0.75rem 0 !important; }
+  .bcol + .bcol {
+    border-left: none !important;
+    border-right: none !important;
+    border-top: 0.5px solid var(--rule);
+  }
+
+  .dateline span:first-child { display: none; }
+}

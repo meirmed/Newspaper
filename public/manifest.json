@@ -1,0 +1,26 @@
+{
+  "short_name": "Chronicle",
+  "name": "The Chronicle of Time",
+  "description": "Your historical newspaper — discover what happened on any date in history",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#1a1a1a",
+  "background_color": "#f5f0e8",
+  "categories": ["education", "news"],
+  "lang": "en"
+}
