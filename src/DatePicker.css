@@ -125,3 +125,64 @@
   color: var(--accent);
   font-style: italic;
 }
+
+.dmy-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  justify-content: center;
+  width: 100%;
+  max-width: 280px;
+}
+
+.dmy-field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.dmy-field--year {
+  flex: 1.8;
+}
+
+.dmy-field label {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.68rem;
+  color: var(--ink-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.dmy-input {
+  width: 100%;
+  padding: 0.75rem 0.4rem;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.05rem;
+  border: 1.5px solid var(--rule);
+  border-radius: 3px;
+  background: white;
+  color: var(--ink);
+  text-align: center;
+  -moz-appearance: textfield;
+}
+
+.dmy-input::-webkit-outer-spin-button,
+.dmy-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.dmy-input:focus {
+  outline: none;
+  border-color: var(--ink);
+}
+
+.dmy-sep {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.3rem;
+  color: var(--ink-muted);
+  padding-bottom: 0.6rem;
+  flex-shrink: 0;
+}
