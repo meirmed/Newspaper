@@ -110,3 +110,33 @@
   color: var(--accent);
   font-style: italic;
 }
+
+.mode-toggle {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+  background: #f0ebe0;
+  border-radius: 4px;
+  padding: 3px;
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mode-toggle button {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.78rem;
+  padding: 6px 10px;
+  border-radius: 3px;
+  color: var(--ink-muted);
+  transition: all 0.15s;
+}
+
+.mode-toggle button.active {
+  background: var(--ink);
+  color: var(--paper);
+}
