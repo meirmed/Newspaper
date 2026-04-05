@@ -5,8 +5,6 @@ const MONTHS_EN = ['January','February','March','April','May','June','July','Aug
 const MONTHS_HE = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
 const DAYS_EN = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
-const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
 function formatDate(year, month, day, language) {
   const d = new Date(year, month - 1, day);
   if (language === 'he') {
@@ -25,46 +23,43 @@ function formatDate(year, month, day, language) {
   };
 }
 
+function validateAndGenerate(day, month, year, language, setError, onGenerate, isHe) {
+  const d = parseInt(day, 10), m = parseInt(month, 10), y = parseInt(year, 10);
+  if (!d || !m || !y) { setError(isHe ? 'אנא מלא את כל השדות' : 'Please fill all fields'); return; }
+  if (m < 1 || m > 12) { setError(isHe ? 'חודש לא תקין (1-12)' : 'Invalid month (1–12)'); return; }
+  if (d < 1 || d > 31) { setError(isHe ? 'יום לא תקין (1-31)' : 'Invalid day (1–31)'); return; }
+  if (y < 1800 || y > 2024) { setError(isHe ? 'שנה לא תקינה (1800-2024)' : 'Invalid year (1800–2024)'); return; }
+  const dateObj = new Date(y, m - 1, d);
+  if (dateObj.getMonth() !== m - 1) { setError(isHe ? 'תאריך לא קיים' : 'Date does not exist'); return; }
+  setError('');
+  onGenerate(formatDate(y, m, d, language));
+}
+
 export default function DatePicker({ onGenerate, language, error }) {
   const isHe = language === 'he';
-
-  // Desktop state
   const [pickerVal, setPickerVal] = useState('');
-
-  // Mobile state
+  const [showManual, setShowManual] = useState(false);
   const [mDay, setMDay] = useState('');
   const [mMonth, setMMonth] = useState('');
   const [mYear, setMYear] = useState('');
-
   const [inputError, setInputError] = useState('');
 
-  function handleDesktopSubmit(e) {
+  function handlePickerSubmit(e) {
     e.preventDefault();
     setInputError('');
-    if (!pickerVal) {
-      setInputError(isHe ? 'אנא הכנס תאריך' : 'Please enter a date');
-      return;
-    }
+    if (!pickerVal) { setInputError(isHe ? 'אנא בחר תאריך' : 'Please select a date'); return; }
     const [y, m, d] = pickerVal.split('-').map(Number);
     onGenerate(formatDate(y, m, d, language));
   }
 
-  function handleMobileSubmit(e) {
+  function handleManualSubmit(e) {
     e.preventDefault();
-    setInputError('');
-    const d = parseInt(mDay, 10);
-    const m = parseInt(mMonth, 10);
-    const y = parseInt(mYear, 10);
-    if (!d || !m || !y) {
-      setInputError(isHe ? 'אנא מלא יום, חודש ושנה' : 'Please fill in day, month and year');
-      return;
-    }
-    if (m < 1 || m > 12) { setInputError(isHe ? 'חודש לא תקין (1-12)' : 'Invalid month (1-12)'); return; }
-    if (d < 1 || d > 31) { setInputError(isHe ? 'יום לא תקין (1-31)' : 'Invalid day (1-31)'); return; }
-    if (y < 1800 || y > 2024) { setInputError(isHe ? 'שנה לא תקינה (1800-2024)' : 'Invalid year (1800-2024)'); return; }
-    const dateObj = new Date(y, m - 1, d);
-    if (dateObj.getMonth() !== m - 1) { setInputError(isHe ? 'תאריך לא קיים' : 'Date does not exist'); return; }
-    onGenerate(formatDate(y, m, d, language));
+    validateAndGenerate(mDay, mMonth, mYear, language, setInputError, onGenerate, isHe);
+  }
+
+  function limitInput(val, max) {
+    const num = val.replace(/\D/g, '');
+    return num.slice(0, max);
   }
 
   return (
@@ -82,8 +77,8 @@ export default function DatePicker({ onGenerate, language, error }) {
             : 'Enter any date — a birthday, anniversary, or moment in time — and receive a historical front page.'}
         </p>
 
-        {!isMobile ? (
-          <form onSubmit={handleDesktopSubmit} className="picker-form">
+        {!showManual ? (
+          <form onSubmit={handlePickerSubmit} className="picker-form">
             <input
               type="date"
               className="date-input"
@@ -95,19 +90,22 @@ export default function DatePicker({ onGenerate, language, error }) {
             <button type="submit" className="print-btn">
               {isHe ? 'הדפס מהדורה' : 'Print Edition'}
             </button>
+            <button type="button" className="toggle-link" onClick={() => { setInputError(''); setShowManual(true); }}>
+              {isHe ? 'הקלד תאריך ידנית' : 'Type date manually'}
+            </button>
           </form>
         ) : (
-          <form onSubmit={handleMobileSubmit} className="picker-form">
+          <form onSubmit={handleManualSubmit} className="picker-form">
             <div className="dmy-row" dir="ltr">
               <div className="dmy-field">
                 <label>{isHe ? 'יום' : 'Day'}</label>
                 <input
-                  type="number"
+                  type="text"
                   className="dmy-input"
                   placeholder="DD"
-                  min="1" max="31"
+                  maxLength="2"
                   value={mDay}
-                  onChange={e => setMDay(e.target.value)}
+                  onChange={e => setMDay(limitInput(e.target.value, 2))}
                   inputMode="numeric"
                 />
               </div>
@@ -115,12 +113,12 @@ export default function DatePicker({ onGenerate, language, error }) {
               <div className="dmy-field">
                 <label>{isHe ? 'חודש' : 'Month'}</label>
                 <input
-                  type="number"
+                  type="text"
                   className="dmy-input"
                   placeholder="MM"
-                  min="1" max="12"
+                  maxLength="2"
                   value={mMonth}
-                  onChange={e => setMMonth(e.target.value)}
+                  onChange={e => setMMonth(limitInput(e.target.value, 2))}
                   inputMode="numeric"
                 />
               </div>
@@ -128,18 +126,21 @@ export default function DatePicker({ onGenerate, language, error }) {
               <div className="dmy-field dmy-field--year">
                 <label>{isHe ? 'שנה' : 'Year'}</label>
                 <input
-                  type="number"
+                  type="text"
                   className="dmy-input"
                   placeholder="YYYY"
-                  min="1800" max="2024"
+                  maxLength="4"
                   value={mYear}
-                  onChange={e => setMYear(e.target.value)}
+                  onChange={e => setMYear(limitInput(e.target.value, 4))}
                   inputMode="numeric"
                 />
               </div>
             </div>
             <button type="submit" className="print-btn">
               {isHe ? 'הדפס מהדורה' : 'Print Edition'}
+            </button>
+            <button type="button" className="toggle-link" onClick={() => { setInputError(''); setShowManual(false); }}>
+              {isHe ? 'חזור לבחירת תאריך' : 'Use date picker instead'}
             </button>
           </form>
         )}
