@@ -175,4 +175,8 @@ export default function DatePicker({ onGenerateDate, onGenerateYear, language, e
           </div>
         )}
 
-        {(inputError || error) && <p className="error-msg"
+        {(inputError || error) && <p className="error-msg">{inputError || error}</p>}
+      </div>
+    </div>
+  );
+}
