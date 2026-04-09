@@ -10,16 +10,13 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 async function fetchWikipediaData(month, day) {
   const url = `https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/all/${month}/${day}`;
-  const res = await fetch(url, {
-    headers: { 'User-Agent': 'ChronicleOfTime/1.0 (historical newspaper app)' }
-  });
+  const res = await fetch(url, { headers: { 'User-Agent': 'ChronicleOfTime/1.0' } });
   if (!res.ok) throw new Error('Wikipedia API error: ' + res.status);
   return await res.json();
 }
 
 function pickBestEvents(events, count) {
   if (!events || events.length === 0) return [];
-  // Sort by number of pages linked (proxy for importance)
   const sorted = [...events].sort((a, b) => (b.pages?.length || 0) - (a.pages?.length || 0));
   return sorted.slice(0, count).map(e => `${e.year}: ${e.text}`);
 }
@@ -33,133 +30,194 @@ function pickBestBirths(births, count) {
   });
 }
 
+// ── FULL DATE NEWSPAPER ──────────────────────────────────────────────────────
+
 app.post('/api/newspaper', async (req, res) => {
   const { formattedDate, month, day, year, language } = req.body;
   if (!formattedDate) return res.status(400).json({ error: 'Missing date' });
 
   const isHebrew = language === 'he';
-
-  let wikiEvents = [];
-  let wikiBirths = [];
+  let wikiEvents = [], wikiBirths = [];
 
   try {
     const wikiData = await fetchWikipediaData(month, day);
     wikiEvents = pickBestEvents(wikiData.events, 12);
     wikiBirths = pickBestBirths(wikiData.births, 10);
   } catch (e) {
-    console.warn('Wikipedia fetch failed, falling back to Claude knowledge:', e.message);
+    console.warn('Wikipedia fetch failed:', e.message);
   }
 
-  const hasWikiData = wikiEvents.length > 0;
-
-  const eventsContext = hasWikiData
-    ? `VERIFIED HISTORICAL EVENTS on ${month}/${day} from Wikipedia (use these as your source):\n${wikiEvents.join('\n')}`
+  const eventsContext = wikiEvents.length > 0
+    ? `VERIFIED HISTORICAL EVENTS on ${month}/${day} from Wikipedia:\n${wikiEvents.join('\n')}`
     : `Use your knowledge of real historical events on ${month}/${day}.`;
 
-  const birthsContext = hasWikiData && wikiBirths.length > 0
-    ? `VERIFIED BIRTHS on ${month}/${day} from Wikipedia (use ONLY these, do not invent any):\n${wikiBirths.join('\n')}`
+  const birthsContext = wikiBirths.length > 0
+    ? `VERIFIED BIRTHS on ${month}/${day} from Wikipedia (use ONLY these):\n${wikiBirths.join('\n')}`
     : `Use your knowledge of notable people born on ${month}/${day}.`;
 
-  const prompt = isHebrew
-    ? `אתה עורך עיתון היסטורי. כתוב עמוד שער עיתון היסטורי מרתק לתאריך: ${formattedDate}.
-
-להלן נתונים מאומתים מוויקיפדיה — השתמש בהם בלבד, אל תמציא עובדות:
-
-אירועים היסטוריים:
-${wikiEvents.length > 0 ? wikiEvents.join('\n') : 'השתמש בידע שלך על אירועים היסטוריים בתאריך זה.'}
-
-ילידי היום:
-${wikiBirths.length > 0 ? wikiBirths.join('\n') : 'השתמש בידע שלך על אנשים מפורסמים שנולדו בתאריך זה.'}
-
-החזר אך ורק אובייקט JSON תקני, ללא backticks, ללא טקסט נוסף:
-{
-  "mainHeadline": "כותרת דרמטית על האירוע המשמעותי ביותר מהרשימה למעלה",
-  "mainDeck": "תת-כותרת מרתקת של 1-2 משפטים",
-  "mainBody": "3-4 משפטים בסגנון עיתונות ציורית על האירוע הראשי, כולל השנה",
-  "col1Tag": "קטגוריה",
-  "col1Headline": "כותרת לאירוע שני מהרשימה",
-  "col1Body": "2-3 משפטים על האירוע כולל השנה",
-  "col2Tag": "קטגוריה",
-  "col2Headline": "כותרת לאירוע שלישי מהרשימה",
-  "col2Body": "2-3 משפטים כולל השנה",
-  "col3Tag": "קטגוריה",
-  "col3Headline": "כותרת לאירוע רביעי מהרשימה",
-  "col3Body": "2-3 משפטים כולל השנה",
-  "curiosities": [
-    {"title": "הידעת?", "body": "עובדה מעניינת מהאירועים שלמעלה"},
-    {"title": "במספרים", "body": "עובדה סטטיסטית מפתיעה הקשורה לאירועים"},
-    {"title": "העולם אז", "body": "תיאור חי של החיים היומיומיים בשנה הבולטת"}
-  ],
-  "notableBirths": [
-    {"year": 1900, "name": "שם מהרשימה", "note": "תיאור קצר"},
-    {"year": 1920, "name": "שם נוסף", "note": "תיאור קצר"},
-    {"year": 1950, "name": "שם שלישי", "note": "תיאור קצר"},
-    {"year": 1970, "name": "שם רביעי", "note": "תיאור קצר"},
-    {"year": 1985, "name": "שם חמישי", "note": "תיאור קצר"}
-  ]
-}
-החזר אך ורק את אובייקט ה-JSON הגולמי.`
-    : `You are a historical newspaper editor. Write a vivid newspaper front page for: ${formattedDate}.
+  const englishPrompt = `You are a historical newspaper editor. Write a vivid newspaper front page for: ${formattedDate}.
 
 ${eventsContext}
 
 ${birthsContext}
 
-Instructions:
 - Base ALL stories on the verified events listed above
-- For notableBirths, use ONLY people from the verified births list above — do not invent or substitute anyone
-- Write in dramatic, engaging newspaper style
-- Include the year in each story
+- For notableBirths use ONLY people from the verified births list
+- Write in dramatic engaging newspaper style, include the year in each story
+- For notableBirths names also provide Hebrew transliteration in parentheses e.g. "Nicole Kidman (ניקול קידמן)"
 
-Return ONLY a raw JSON object, no backticks, no other text:
+Return ONLY raw JSON, no backticks:
 {
-  "mainHeadline": "Dramatic headline based on the most significant event from the list above",
-  "mainDeck": "Compelling 1-2 sentence subheadline expanding on the main story",
-  "mainBody": "3-4 sentences of vivid newspaper prose about the main event, including the year",
+  "mainHeadline": "dramatic headline from the most significant event",
+  "mainDeck": "1-2 sentence subheadline",
+  "mainBody": "3-4 sentences vivid prose about the main event including year",
   "col1Tag": "POLITICS or WAR or SCIENCE or ARTS or EXPLORATION or SPORTS",
-  "col1Headline": "Headline for a second event from the list",
-  "col1Body": "2-3 sentences including the year",
+  "col1Headline": "headline for second event",
+  "col1Body": "2-3 sentences including year",
   "col2Tag": "category",
-  "col2Headline": "Headline for a third event from the list",
-  "col2Body": "2-3 sentences including the year",
+  "col2Headline": "headline for third event",
+  "col2Body": "2-3 sentences including year",
   "col3Tag": "category",
-  "col3Headline": "Headline for a fourth event from the list",
-  "col3Body": "2-3 sentences including the year",
+  "col3Headline": "headline for fourth event",
+  "col3Body": "2-3 sentences including year",
   "curiosities": [
-    {"title": "Did You Know?", "body": "An interesting fact derived from the events above"},
-    {"title": "By The Numbers", "body": "A surprising statistic related to one of the events"},
-    {"title": "The World Then", "body": "A vivid snapshot of everyday life in the year of the main event"}
+    {"title": "Did You Know?", "body": "interesting fact from the events above"},
+    {"title": "By The Numbers", "body": "surprising statistic related to one of the events"},
+    {"title": "The World Then", "body": "vivid snapshot of everyday life in the year of the main event"}
   ],
   "notableBirths": [
-    {"year": 1900, "name": "Name from verified list", "note": "brief description"},
-    {"year": 1920, "name": "Name from verified list", "note": "brief description"},
-    {"year": 1950, "name": "Name from verified list", "note": "brief description"},
-    {"year": 1970, "name": "Name from verified list", "note": "brief description"},
-    {"year": 1985, "name": "Name from verified list", "note": "brief description"}
+    {"year": 1900, "name": "Full Name (עברית)", "note": "brief description"},
+    {"year": 1930, "name": "Full Name (עברית)", "note": "brief description"},
+    {"year": 1955, "name": "Full Name (עברית)", "note": "brief description"},
+    {"year": 1970, "name": "Full Name (עברית)", "note": "brief description"},
+    {"year": 1985, "name": "Full Name (עברית)", "note": "brief description"}
   ]
 }`;
 
   try {
-    const message = await client.messages.create({
+    const englishMsg = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 4000,
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: 'user', content: englishPrompt }],
     });
+    const rawEn = englishMsg.content.map(b => b.text || '').join('');
+    const cleanEn = rawEn.replace(/```json/g, '').replace(/```/g, '').trim();
+    const enData = JSON.parse(cleanEn);
 
-    const raw = message.content.map(b => b.text || '').join('');
-    const clean = raw.replace(/```json/g, '').replace(/```/g, '').trim();
-    const data = JSON.parse(clean);
-    res.json(data);
+    if (!isHebrew) {
+      if (enData.notableBirths) {
+        enData.notableBirths = enData.notableBirths.map(b => ({
+          ...b, name: b.name.replace(/\s*\([^)]*[\u0590-\u05FF][^)]*\)/g, '').trim()
+        }));
+      }
+      return res.json(enData);
+    }
+
+    // Translate to Hebrew
+    const heMsg = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 4000,
+      messages: [{ role: 'user', content: `Translate this newspaper JSON to Hebrew. For notableBirths names: extract only the Hebrew text from parentheses (e.g. from "Nicole Kidman (ניקול קידמן)" use "ניקול קידמן"). Translate all other text fields. Keep years as numbers. Return ONLY raw JSON:\n${cleanEn}` }],
+    });
+    const rawHe = heMsg.content.map(b => b.text || '').join('');
+    const cleanHe = rawHe.replace(/```json/g, '').replace(/```/g, '').trim();
+    const heData = JSON.parse(cleanHe);
+
+    if (heData.notableBirths) {
+      heData.notableBirths = heData.notableBirths.map(b => {
+        const m = b.name.match(/\(([^\)]*[\u0590-\u05FF][^\)]*)\)/);
+        if (m) b.name = m[1].trim();
+        return b;
+      });
+    }
+    res.json(heData);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
-function getMonthHe(month) {
-  const m = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
-  return m[parseInt(month, 10) - 1] || '';
-}
+// ── BIRTH YEAR NEWSPAPER ─────────────────────────────────────────────────────
+
+app.post('/api/birthyear', async (req, res) => {
+  const { year, language } = req.body;
+  if (!year) return res.status(400).json({ error: 'Missing year' });
+
+  const isHebrew = language === 'he';
+
+  const englishPrompt = `You are a historical newspaper editor. Create a "The Year You Were Born" special edition newspaper for the year ${year}.
+
+Cover the biggest and most memorable events, cultural moments, inventions, and births of that entire year.
+
+Return ONLY raw JSON, no backticks:
+{
+  "mainHeadline": "The single most important or dramatic headline from ${year}",
+  "mainDeck": "1-2 sentence subheadline expanding on the main story",
+  "mainBody": "3-4 sentences of vivid newspaper prose about the main event of ${year}",
+  "col1Tag": "POLITICS or WAR or SCIENCE or ARTS or SPORTS",
+  "col1Headline": "Second biggest story of ${year}",
+  "col1Body": "2-3 sentences",
+  "col2Tag": "category",
+  "col2Headline": "Third story of ${year}",
+  "col2Body": "2-3 sentences",
+  "col3Tag": "category",
+  "col3Headline": "Fourth story of ${year}",
+  "col3Body": "2-3 sentences",
+  "curiosities": [
+    {"title": "Life in ${year}", "body": "What everyday life looked like — prices, fashion, technology, culture"},
+    {"title": "Born This Year", "body": "Notable people born in ${year} — include 3-4 names with Hebrew transliteration in parentheses"},
+    {"title": "The World in Numbers", "body": "Surprising statistics or facts that define ${year}"}
+  ],
+  "notableBirths": [
+    {"year": ${year}, "name": "Famous Person (עברית)", "note": "brief description"},
+    {"year": ${year}, "name": "Famous Person (עברית)", "note": "brief description"},
+    {"year": ${year}, "name": "Famous Person (עברית)", "note": "brief description"},
+    {"year": ${year}, "name": "Famous Person (עברית)", "note": "brief description"},
+    {"year": ${year}, "name": "Famous Person (עברית)", "note": "brief description"}
+  ]
+}`;
+
+  try {
+    const englishMsg = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 4000,
+      messages: [{ role: 'user', content: englishPrompt }],
+    });
+    const rawEn = englishMsg.content.map(b => b.text || '').join('');
+    const cleanEn = rawEn.replace(/```json/g, '').replace(/```/g, '').trim();
+    const enData = JSON.parse(cleanEn);
+
+    if (!isHebrew) {
+      if (enData.notableBirths) {
+        enData.notableBirths = enData.notableBirths.map(b => ({
+          ...b, name: b.name.replace(/\s*\([^)]*[\u0590-\u05FF][^)]*\)/g, '').trim()
+        }));
+      }
+      return res.json(enData);
+    }
+
+    const heMsg = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 4000,
+      messages: [{ role: 'user', content: `Translate this newspaper JSON to Hebrew. For notableBirths names: extract only the Hebrew text from parentheses. Translate all other text fields. Keep years as numbers. Return ONLY raw JSON:\n${cleanEn}` }],
+    });
+    const rawHe = heMsg.content.map(b => b.text || '').join('');
+    const cleanHe = rawHe.replace(/```json/g, '').replace(/```/g, '').trim();
+    const heData = JSON.parse(cleanHe);
+
+    if (heData.notableBirths) {
+      heData.notableBirths = heData.notableBirths.map(b => {
+        const m = b.name.match(/\(([^\)]*[\u0590-\u05FF][^\)]*)\)/);
+        if (m) b.name = m[1].trim();
+        return b;
+      });
+    }
+    res.json(heData);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
