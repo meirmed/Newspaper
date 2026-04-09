@@ -58,24 +58,36 @@ export default function DatePicker({ onGenerate, language, error }) {
   }
 
   function limitInput(val, max) {
-    const num = val.replace(/\D/g, '');
-    return num.slice(0, max);
+    return val.replace(/\D/g, '').slice(0, max);
   }
 
   return (
     <div className="picker-wrap">
       <div className="picker-card">
         <div className="nameplate-en">The Chronicle of Time</div>
-        {isHe && <div className="nameplate-he">דברי הימים — כרוניקת הזמן</div>}
-        <div className="tagline">
-          {isHe ? '"כל ההיסטוריה הראויה לדפוס"' : '"All the History That\'s Fit to Print"'}
-        </div>
+        <div className="nameplate-he">{isHe ? 'דברי הימים — כרוניקת הזמן' : 'All the History That\'s Fit to Print'}</div>
         <div className="thick-rule" />
         <p className="intro">
           {isHe
             ? 'הכנס תאריך — יום הולדת, יום נישואין, או כל רגע בזמן — וקבל עמוד שער היסטורי.'
             : 'Enter any date — a birthday, anniversary, or moment in time — and receive a historical front page.'}
         </p>
+
+        <div className="manual-label">
+          {showManual ? (
+            <>
+              {isHe ? 'הקלד תאריך ידנית, או ' : 'Type the date manually, or '}
+              <button type="button" className="toggle-link" onClick={() => { setInputError(''); setShowManual(false); }}>
+                {isHe ? 'בחר מלוח שנה' : 'choose from calendar'}
+              </button>
+              {isHe ? ':' : ':'}
+            </>
+          ) : (
+            <>
+              {isHe ? 'הקלד תאריך ידנית, או בחר מלוח שנה:' : 'Type the date manually, or choose from calendar:'}
+            </>
+          )}
+        </div>
 
         {!showManual ? (
           <form onSubmit={handlePickerSubmit} className="picker-form">
@@ -87,11 +99,11 @@ export default function DatePicker({ onGenerate, language, error }) {
               max="2024-12-31"
               onChange={e => setPickerVal(e.target.value)}
             />
+            <button type="button" className="toggle-link toggle-link--below" onClick={() => { setInputError(''); setShowManual(true); }}>
+              {isHe ? 'הקלד תאריך ידנית' : 'Type date manually instead'}
+            </button>
             <button type="submit" className="print-btn">
               {isHe ? 'הדפס מהדורה' : 'Print Edition'}
-            </button>
-            <button type="button" className="toggle-link" onClick={() => { setInputError(''); setShowManual(true); }}>
-              {isHe ? 'הקלד תאריך ידנית' : 'Type date manually'}
             </button>
           </form>
         ) : (
@@ -138,9 +150,6 @@ export default function DatePicker({ onGenerate, language, error }) {
             </div>
             <button type="submit" className="print-btn">
               {isHe ? 'הדפס מהדורה' : 'Print Edition'}
-            </button>
-            <button type="button" className="toggle-link" onClick={() => { setInputError(''); setShowManual(false); }}>
-              {isHe ? 'חזור לבחירת תאריך' : 'Use date picker instead'}
             </button>
           </form>
         )}
