@@ -12,21 +12,30 @@
   text-align: center;
 }
 
-.nameplate-en {
+.nameplate-en-main {
   font-family: 'UnifrakturMaguntia', cursive;
   font-size: clamp(2rem, 10vw, 3.2rem);
   color: var(--ink);
   line-height: 1;
-  margin-bottom: 0.15rem;
+  margin-bottom: 0.2rem;
 }
 
-.nameplate-he {
+.nameplate-he-main {
   font-family: 'Frank Ruhl Libre', serif;
   font-weight: 900;
-  font-size: clamp(1.1rem, 4vw, 1.6rem);
+  font-size: clamp(1.4rem, 6vw, 2.2rem);
   color: var(--ink);
   line-height: 1.2;
-  margin-bottom: 0.15rem;
+  margin-bottom: 0.2rem;
+}
+
+.tagline-sub {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
 }
 
 .thick-rule {
@@ -44,6 +53,37 @@
   color: var(--ink-muted);
   line-height: 1.6;
   margin-bottom: 1.4rem;
+}
+
+.mode-tabs {
+  display: flex;
+  gap: 0;
+  justify-content: center;
+  margin: 0 auto 1.2rem;
+  border: 1.5px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+  max-width: 280px;
+}
+
+.mode-tabs button {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.82rem;
+  padding: 8px 12px;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  border-right: 1px solid var(--rule);
+}
+
+.mode-tabs button:last-child { border-right: none; }
+
+.mode-tabs button.active {
+  background: var(--ink);
+  color: var(--paper);
 }
 
 .manual-label {
@@ -78,6 +118,12 @@
 .date-input:focus {
   outline: none;
   border-color: var(--ink);
+}
+
+.year-input {
+  text-align: center !important;
+  font-size: 1.4rem !important;
+  letter-spacing: 4px;
 }
 
 .print-btn {
@@ -116,11 +162,6 @@
 }
 
 .toggle-link:hover { color: var(--ink); }
-
-.toggle-link--below {
-  margin-top: -0.25rem;
-  margin-bottom: 0.1rem;
-}
 
 .error-msg {
   margin-top: 0.5rem;
@@ -181,64 +222,3 @@
   padding-bottom: 0.55rem;
   flex-shrink: 0;
 }
-
-.mode-tabs {
-  display: flex;
-  gap: 0;
-  justify-content: center;
-  margin-bottom: 1.2rem;
-  border: 1.5px solid var(--rule);
-  border-radius: 3px;
-  overflow: hidden;
-  max-width: 280px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.mode-tabs button {
-  flex: 1;
-  border: none;
-  background: transparent;
-  font-family: 'Libre Baskerville', serif;
-  font-size: 0.82rem;
-  padding: 8px 12px;
-  color: var(--ink-muted);
-  cursor: pointer;
-  transition: all 0.15s;
-  border-right: 1px solid var(--rule);
-}
-
-.mode-tabs button:last-child { border-right: none; }
-
-.mode-tabs button.active {
-  background: var(--ink);
-  color: var(--paper);
-}
-
-.year-input {
-  text-align: center;
-  font-size: 1.4rem !important;
-  letter-spacing: 4px;
-}
-
-.manual-label {
-  font-family: 'Libre Baskerville', serif;
-  font-size: 0.82rem;
-  color: var(--ink-muted);
-  margin-bottom: 0.75rem;
-  line-height: 1.5;
-}
-
-.toggle-link {
-  background: none;
-  border: none;
-  font-family: 'IM Fell English', serif;
-  font-style: italic;
-  font-size: 0.85rem;
-  color: var(--ink-muted);
-  cursor: pointer;
-  text-decoration: underline;
-  padding: 0;
-  -webkit-tap-highlight-color: transparent;
-}
-.toggle-link:hover { color: var(--ink); }
