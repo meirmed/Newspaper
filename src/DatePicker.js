@@ -23,8 +23,13 @@ function formatDate(year, month, day, language) {
   };
 }
 
+function limitNum(val, max) {
+  return val.replace(/\D/g, '').slice(0, max);
+}
+
 export default function DatePicker({ onGenerateDate, onGenerateYear, language, error, mode, setMode }) {
   const isHe = language === 'he';
+
   const [pickerVal, setPickerVal] = useState('');
   const [showManual, setShowManual] = useState(false);
   const [mDay, setMDay] = useState('');
@@ -33,14 +38,18 @@ export default function DatePicker({ onGenerateDate, onGenerateYear, language, e
   const [birthYear, setBirthYear] = useState('');
   const [inputError, setInputError] = useState('');
 
-  function limitInput(val, max) {
-    return val.replace(/\D/g, '').slice(0, max);
+  function switchMode(m) {
+    setMode(m);
+    setInputError('');
   }
 
   function handlePickerSubmit(e) {
     e.preventDefault();
     setInputError('');
-    if (!pickerVal) { setInputError(isHe ? 'אנא בחר תאריך' : 'Please select a date'); return; }
+    if (!pickerVal) {
+      setInputError(isHe ? 'אנא בחר תאריך' : 'Please select a date');
+      return;
+    }
     const [y, m, d] = pickerVal.split('-').map(Number);
     onGenerateDate(formatDate(y, m, d, language));
   }
@@ -50,8 +59,8 @@ export default function DatePicker({ onGenerateDate, onGenerateYear, language, e
     setInputError('');
     const d = parseInt(mDay, 10), m = parseInt(mMonth, 10), y = parseInt(mYear, 10);
     if (!d || !m || !y) { setInputError(isHe ? 'אנא מלא את כל השדות' : 'Please fill all fields'); return; }
-    if (m < 1 || m > 12) { setInputError(isHe ? 'חודש לא תקין' : 'Invalid month'); return; }
-    if (d < 1 || d > 31) { setInputError(isHe ? 'יום לא תקין' : 'Invalid day'); return; }
+    if (m < 1 || m > 12) { setInputError(isHe ? 'חודש לא תקין (1-12)' : 'Invalid month (1–12)'); return; }
+    if (d < 1 || d > 31) { setInputError(isHe ? 'יום לא תקין (1-31)' : 'Invalid day (1–31)'); return; }
     if (y < 1800 || y > 2024) { setInputError(isHe ? 'שנה לא תקינה (1800-2024)' : 'Invalid year (1800–2024)'); return; }
     const dateObj = new Date(y, m - 1, d);
     if (dateObj.getMonth() !== m - 1) { setInputError(isHe ? 'תאריך לא קיים' : 'Date does not exist'); return; }
@@ -62,16 +71,26 @@ export default function DatePicker({ onGenerateDate, onGenerateYear, language, e
     e.preventDefault();
     setInputError('');
     const y = parseInt(birthYear, 10);
-    if (!y || y < 1800 || y > 2024) { setInputError(isHe ? 'שנה לא תקינה (1800-2024)' : 'Invalid year (1800–2024)'); return; }
+    if (!y || y < 1800 || y > 2024) {
+      setInputError(isHe ? 'שנה לא תקינה (1800-2024)' : 'Invalid year (1800–2024)');
+      return;
+    }
     onGenerateYear(y);
   }
 
   return (
     <div className="picker-wrap">
       <div className="picker-card">
-        <div className="nameplate-en">{isHe ? '' : 'The Chronicle of Time'}</div>
-        <div className="nameplate-he">{isHe ? 'דברי הימים — כרוניקת הזמן' : '"All the History That\'s Fit to Print"'}</div>
+
+        {isHe
+          ? <div className="nameplate-he-main">דברי הימים — כרוניקת הזמן</div>
+          : <div className="nameplate-en-main">The Chronicle of Time</div>
+        }
+        <div className="tagline-sub">
+          {isHe ? '"כל ההיסטוריה הראויה לדפוס"' : '"All the History That\'s Fit to Print"'}
+        </div>
         <div className="thick-rule" />
+
         <p className="intro">
           {isHe
             ? 'הכנס תאריך — יום הולדת, יום נישואין, או כל רגע בזמן — וקבל עמוד שער היסטורי.'
@@ -79,19 +98,20 @@ export default function DatePicker({ onGenerateDate, onGenerateYear, language, e
         </p>
 
         <div className="mode-tabs">
-          <button className={mode === 'date' ? 'active' : ''} onClick={() => { setMode('date'); setInputError(''); }}>
+          <button type="button" className={mode === 'date' ? 'active' : ''} onClick={() => switchMode('date')}>
             {isHe ? 'תאריך מלא' : 'Full Date'}
           </button>
-          <button className={mode === 'year' ? 'active' : ''} onClick={() => { setMode('year'); setInputError(''); }}>
+          <button type="button" className={mode === 'year' ? 'active' : ''} onClick={() => switchMode('year')}>
             {isHe ? 'שנת לידה' : 'Birth Year'}
           </button>
         </div>
 
-        {mode === 'date' ? (
+        {mode === 'date' && (
           <>
             <div className="manual-label">
               {isHe ? 'הקלד תאריך ידנית, או בחר מלוח שנה:' : 'Type the date manually, or choose from calendar:'}
             </div>
+
             {!showManual ? (
               <form onSubmit={handlePickerSubmit} className="picker-form">
                 <input
@@ -115,19 +135,19 @@ export default function DatePicker({ onGenerateDate, onGenerateYear, language, e
                   <div className="dmy-field">
                     <label>{isHe ? 'יום' : 'Day'}</label>
                     <input type="text" className="dmy-input" placeholder="DD" maxLength="2"
-                      value={mDay} onChange={e => setMDay(limitInput(e.target.value, 2))} inputMode="numeric" />
+                      value={mDay} onChange={e => setMDay(limitNum(e.target.value, 2))} inputMode="numeric" />
                   </div>
                   <div className="dmy-sep">/</div>
                   <div className="dmy-field">
                     <label>{isHe ? 'חודש' : 'Month'}</label>
                     <input type="text" className="dmy-input" placeholder="MM" maxLength="2"
-                      value={mMonth} onChange={e => setMMonth(limitInput(e.target.value, 2))} inputMode="numeric" />
+                      value={mMonth} onChange={e => setMMonth(limitNum(e.target.value, 2))} inputMode="numeric" />
                   </div>
                   <div className="dmy-sep">/</div>
                   <div className="dmy-field dmy-field--year">
                     <label>{isHe ? 'שנה' : 'Year'}</label>
                     <input type="text" className="dmy-input" placeholder="YYYY" maxLength="4"
-                      value={mYear} onChange={e => setMYear(limitInput(e.target.value, 4))} inputMode="numeric" />
+                      value={mYear} onChange={e => setMYear(limitNum(e.target.value, 4))} inputMode="numeric" />
                   </div>
                 </div>
                 <button type="button" className="toggle-link" onClick={() => { setInputError(''); setShowManual(false); }}>
@@ -139,7 +159,9 @@ export default function DatePicker({ onGenerateDate, onGenerateYear, language, e
               </form>
             )}
           </>
-        ) : (
+        )}
+
+        {mode === 'year' && (
           <>
             <div className="manual-label">
               {isHe
@@ -153,7 +175,7 @@ export default function DatePicker({ onGenerateDate, onGenerateYear, language, e
                 placeholder={isHe ? 'למשל: 1974' : 'e.g. 1974'}
                 value={birthYear}
                 maxLength="4"
-                onChange={e => setBirthYear(limitInput(e.target.value, 4))}
+                onChange={e => setBirthYear(limitNum(e.target.value, 4))}
                 inputMode="numeric"
               />
               <button type="submit" className="print-btn">
