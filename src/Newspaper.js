@@ -79,8 +79,8 @@ export default function Newspaper({ data, formattedDate, language }) {
           <span>{isHe ? `כרך ${year}` : `Vol. ${year} · No. 1`}</span>
         </div>
 
-        <div className="nameplate-en">The Chronicle of Time</div>
-        {isHe && <div className="nameplate-he">דברי הימים — כרוניקת הזמן</div>}
+        {!isHe && <div className="nameplate-en">The Chronicle of Time</div>}
+        <div className="nameplate-he">{isHe ? "דברי הימים — כרוניקת הזמן" : ""}</div>
         <div className="np-tagline">
           {isHe ? '"כל ההיסטוריה הראויה לדפוס"' : '"All the History That\'s Fit to Print"'}
         </div>
