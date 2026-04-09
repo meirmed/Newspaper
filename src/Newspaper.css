@@ -321,3 +321,9 @@
   }
   .main-body { column-count: 2 !important; }
 }
+
+.dl-btn--share {
+  background: #1a6e3c;
+  border-color: #1a6e3c;
+}
+.dl-btn--share:hover { opacity: 0.85; }
