@@ -23,19 +23,10 @@
 .nameplate-he {
   font-family: 'Frank Ruhl Libre', serif;
   font-weight: 900;
-  font-size: clamp(1.2rem, 5vw, 1.8rem);
+  font-size: clamp(1.1rem, 4vw, 1.6rem);
   color: var(--ink);
   line-height: 1.2;
   margin-bottom: 0.15rem;
-}
-
-.tagline {
-  font-family: 'IM Fell English', serif;
-  font-style: italic;
-  font-size: 0.82rem;
-  color: var(--ink-muted);
-  letter-spacing: 1px;
-  margin-bottom: 0.5rem;
 }
 
 .thick-rule {
@@ -52,7 +43,15 @@
   font-size: 0.95rem;
   color: var(--ink-muted);
   line-height: 1.6;
-  margin-bottom: 1.8rem;
+  margin-bottom: 1.4rem;
+}
+
+.manual-label {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
 }
 
 .picker-form {
@@ -113,11 +112,15 @@
   cursor: pointer;
   text-decoration: underline;
   padding: 0;
-  margin-top: 0.25rem;
   -webkit-tap-highlight-color: transparent;
 }
 
 .toggle-link:hover { color: var(--ink); }
+
+.toggle-link--below {
+  margin-top: -0.25rem;
+  margin-bottom: 0.1rem;
+}
 
 .error-msg {
   margin-top: 0.5rem;
