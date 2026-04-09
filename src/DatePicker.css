@@ -222,3 +222,27 @@
   padding-bottom: 0.55rem;
   flex-shrink: 0;
 }
+
+.form-area {
+  width: 100%;
+}
+
+.tab-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.82rem;
+  padding: 8px 12px;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  border-right: 1px solid var(--rule);
+}
+
+.tab-btn:last-child { border-right: none; }
+
+.tab-btn.active {
+  background: var(--ink);
+  color: var(--paper);
+}
