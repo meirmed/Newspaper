@@ -1,192 +1,248 @@
-import { useState } from 'react';
-import './DatePicker.css';
-
-const MONTHS_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const MONTHS_HE = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
-const DAYS_EN = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-
-function formatDate(year, month, day, language) {
-  const d = new Date(year, month - 1, day);
-  if (language === 'he') {
-    return {
-      formattedDate: `${day} ב${MONTHS_HE[month - 1]} ${year}`,
-      month: String(month).padStart(2, '0'),
-      day: String(day).padStart(2, '0'),
-      year: String(year),
-    };
-  }
-  return {
-    formattedDate: `${DAYS_EN[d.getDay()]}, ${MONTHS_EN[month - 1]} ${day}, ${year}`,
-    month: String(month).padStart(2, '0'),
-    day: String(day).padStart(2, '0'),
-    year: String(year),
-  };
+.picker-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
 }
 
-function limitNum(val, max) {
-  return val.replace(/\D/g, '').slice(0, max);
+.picker-card {
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
 }
 
-export default function DatePicker({ onGenerateDate, onGenerateYear, language, error, mode, setMode }) {
-  const isHe = language === 'he';
+.nameplate-en-main {
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: clamp(2rem, 10vw, 3.2rem);
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: 0.2rem;
+}
 
-  const [pickerVal, setPickerVal] = useState('');
-  const [showManual, setShowManual] = useState(false);
-  const [mDay, setMDay] = useState('');
-  const [mMonth, setMMonth] = useState('');
-  const [mYear, setMYear] = useState('');
-  const [birthYear, setBirthYear] = useState('');
-  const [inputError, setInputError] = useState('');
+.nameplate-he-main {
+  font-family: 'Frank Ruhl Libre', serif;
+  font-weight: 900;
+  font-size: clamp(1.4rem, 6vw, 2.2rem);
+  color: var(--ink);
+  line-height: 1.2;
+  margin-bottom: 0.2rem;
+}
 
-  function switchMode(m) {
-    setMode(m);
-    setInputError('');
-  }
+.tagline-sub {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
 
-  function handlePickerSubmit(e) {
-    e.preventDefault();
-    setInputError('');
-    if (!pickerVal) {
-      setInputError(isHe ? 'אנא בחר תאריך' : 'Please select a date');
-      return;
-    }
-    const [y, m, d] = pickerVal.split('-').map(Number);
-    onGenerateDate(formatDate(y, m, d, language));
-  }
+.thick-rule {
+  border: none;
+  border-top: 4px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  height: 6px;
+  margin: 0.6rem 0 1.2rem;
+}
 
-  function handleManualSubmit(e) {
-    e.preventDefault();
-    setInputError('');
-    const d = parseInt(mDay, 10), m = parseInt(mMonth, 10), y = parseInt(mYear, 10);
-    if (!d || !m || !y) { setInputError(isHe ? 'אנא מלא את כל השדות' : 'Please fill all fields'); return; }
-    if (m < 1 || m > 12) { setInputError(isHe ? 'חודש לא תקין (1-12)' : 'Invalid month (1–12)'); return; }
-    if (d < 1 || d > 31) { setInputError(isHe ? 'יום לא תקין (1-31)' : 'Invalid day (1–31)'); return; }
-    if (y < 1800 || y > 2024) { setInputError(isHe ? 'שנה לא תקינה (1800-2024)' : 'Invalid year (1800–2024)'); return; }
-    const dateObj = new Date(y, m - 1, d);
-    if (dateObj.getMonth() !== m - 1) { setInputError(isHe ? 'תאריך לא קיים' : 'Date does not exist'); return; }
-    onGenerateDate(formatDate(y, m, d, language));
-  }
+.intro {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--ink-muted);
+  line-height: 1.6;
+  margin-bottom: 1.4rem;
+}
 
-  function handleYearSubmit(e) {
-    e.preventDefault();
-    setInputError('');
-    const y = parseInt(birthYear, 10);
-    if (!y || y < 1800 || y > 2024) {
-      setInputError(isHe ? 'שנה לא תקינה (1800-2024)' : 'Invalid year (1800–2024)');
-      return;
-    }
-    onGenerateYear(y);
-  }
+.mode-tabs {
+  display: flex;
+  gap: 0;
+  justify-content: center;
+  margin: 0 auto 1.2rem;
+  border: 1.5px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+  max-width: 280px;
+}
 
-  return (
-    <div className="picker-wrap">
-      <div className="picker-card">
+.mode-tabs button {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.82rem;
+  padding: 8px 12px;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  border-right: 1px solid var(--rule);
+}
 
-        {isHe
-          ? <div className="nameplate-he-main">דברי הימים — כרוניקת הזמן</div>
-          : <div className="nameplate-en-main">The Chronicle of Time</div>
-        }
-        <div className="tagline-sub">
-          {isHe ? '"כל ההיסטוריה הראויה לדפוס"' : '"All the History That\'s Fit to Print"'}
-        </div>
-        <div className="thick-rule" />
+.mode-tabs button:last-child { border-right: none; }
 
-        <p className="intro">
-          {isHe
-            ? 'הכנס תאריך — יום הולדת, יום נישואין, או כל רגע בזמן — וקבל עמוד שער היסטורי.'
-            : 'Enter any date — a birthday, anniversary, or moment in time — and receive a historical front page.'}
-        </p>
+.mode-tabs button.active {
+  background: var(--ink);
+  color: var(--paper);
+}
 
-        <div className="mode-tabs">
-          <button type="button" className={mode === 'date' ? 'active' : ''} onClick={() => switchMode('date')}>
-            {isHe ? 'תאריך מלא' : 'Full Date'}
-          </button>
-          <button type="button" className={mode === 'year' ? 'active' : ''} onClick={() => switchMode('year')}>
-            {isHe ? 'שנת לידה' : 'Birth Year'}
-          </button>
-        </div>
+.manual-label {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
 
-        {mode === 'date' && (
-          <>
-            <div className="manual-label">
-              {isHe ? 'הקלד תאריך ידנית, או בחר מלוח שנה:' : 'Type the date manually, or choose from calendar:'}
-            </div>
+.picker-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+}
 
-            {!showManual ? (
-              <form onSubmit={handlePickerSubmit} className="picker-form">
-                <input
-                  type="date"
-                  className="date-input"
-                  value={pickerVal}
-                  min="1800-01-01"
-                  max="2024-12-31"
-                  onChange={e => setPickerVal(e.target.value)}
-                />
-                <button type="button" className="toggle-link" onClick={() => { setInputError(''); setShowManual(true); }}>
-                  {isHe ? 'הקלד תאריך ידנית' : 'Type date manually instead'}
-                </button>
-                <button type="submit" className="print-btn">
-                  {isHe ? 'הדפס מהדורה' : 'Print Edition'}
-                </button>
-              </form>
-            ) : (
-              <form onSubmit={handleManualSubmit} className="picker-form">
-                <div className="dmy-row" dir="ltr">
-                  <div className="dmy-field">
-                    <label>{isHe ? 'יום' : 'Day'}</label>
-                    <input type="text" className="dmy-input" placeholder="DD" maxLength="2"
-                      value={mDay} onChange={e => setMDay(limitNum(e.target.value, 2))} inputMode="numeric" />
-                  </div>
-                  <div className="dmy-sep">/</div>
-                  <div className="dmy-field">
-                    <label>{isHe ? 'חודש' : 'Month'}</label>
-                    <input type="text" className="dmy-input" placeholder="MM" maxLength="2"
-                      value={mMonth} onChange={e => setMMonth(limitNum(e.target.value, 2))} inputMode="numeric" />
-                  </div>
-                  <div className="dmy-sep">/</div>
-                  <div className="dmy-field dmy-field--year">
-                    <label>{isHe ? 'שנה' : 'Year'}</label>
-                    <input type="text" className="dmy-input" placeholder="YYYY" maxLength="4"
-                      value={mYear} onChange={e => setMYear(limitNum(e.target.value, 4))} inputMode="numeric" />
-                  </div>
-                </div>
-                <button type="button" className="toggle-link" onClick={() => { setInputError(''); setShowManual(false); }}>
-                  {isHe ? 'חזור לבחירת תאריך' : 'Use date picker instead'}
-                </button>
-                <button type="submit" className="print-btn">
-                  {isHe ? 'הדפס מהדורה' : 'Print Edition'}
-                </button>
-              </form>
-            )}
-          </>
-        )}
+.date-input {
+  width: 100%;
+  max-width: 280px;
+  padding: 0.75rem 1rem;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1rem;
+  border: 1.5px solid var(--rule);
+  border-radius: 3px;
+  background: white;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
 
-        {mode === 'year' && (
-          <>
-            <div className="manual-label">
-              {isHe
-                ? 'הכנס שנת לידה וקבל עיתון מיוחד על השנה שנולדת:'
-                : 'Enter a birth year and get a special edition about the year you were born:'}
-            </div>
-            <form onSubmit={handleYearSubmit} className="picker-form">
-              <input
-                type="text"
-                className="date-input year-input"
-                placeholder={isHe ? 'למשל: 1974' : 'e.g. 1974'}
-                value={birthYear}
-                maxLength="4"
-                onChange={e => setBirthYear(limitNum(e.target.value, 4))}
-                inputMode="numeric"
-              />
-              <button type="submit" className="print-btn">
-                {isHe ? 'הדפס מהדורת שנה' : 'Print Year Edition'}
-              </button>
-            </form>
-          </>
-        )}
+.date-input:focus {
+  outline: none;
+  border-color: var(--ink);
+}
 
-        {(inputError || error) && <p className="error-msg">{inputError || error}</p>}
-      </div>
-    </div>
-  );
+.year-input {
+  text-align: center !important;
+  font-size: 1.4rem !important;
+  letter-spacing: 4px;
+}
+
+.print-btn {
+  width: 100%;
+  max-width: 280px;
+  padding: 0.85rem 2rem;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  border-radius: 3px;
+  transition: opacity 0.2s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+
+.print-btn:active {
+  transform: scale(0.97);
+  opacity: 0.85;
+}
+
+.toggle-link {
+  background: none;
+  border: none;
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.toggle-link:hover { color: var(--ink); }
+
+.error-msg {
+  margin-top: 0.5rem;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-style: italic;
+}
+
+.dmy-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  justify-content: center;
+  width: 100%;
+  max-width: 280px;
+}
+
+.dmy-field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.dmy-field--year { flex: 1.8; }
+
+.dmy-field label {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.65rem;
+  color: var(--ink-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.dmy-input {
+  width: 100%;
+  padding: 0.75rem 0.3rem;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.1rem;
+  border: 1.5px solid var(--rule);
+  border-radius: 3px;
+  background: white;
+  color: var(--ink);
+  text-align: center;
+}
+
+.dmy-input:focus {
+  outline: none;
+  border-color: var(--ink);
+}
+
+.dmy-sep {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.4rem;
+  color: var(--ink-muted);
+  padding-bottom: 0.55rem;
+  flex-shrink: 0;
+}
+
+.form-area {
+  width: 100%;
+}
+
+.tab-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.82rem;
+  padding: 8px 12px;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  border-right: 1px solid var(--rule);
+}
+
+.tab-btn:last-child { border-right: none; }
+
+.tab-btn.active {
+  background: var(--ink);
+  color: var(--paper);
 }
