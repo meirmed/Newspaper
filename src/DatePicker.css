@@ -181,3 +181,64 @@
   padding-bottom: 0.55rem;
   flex-shrink: 0;
 }
+
+.mode-tabs {
+  display: flex;
+  gap: 0;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+  border: 1.5px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mode-tabs button {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.82rem;
+  padding: 8px 12px;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  border-right: 1px solid var(--rule);
+}
+
+.mode-tabs button:last-child { border-right: none; }
+
+.mode-tabs button.active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.year-input {
+  text-align: center;
+  font-size: 1.4rem !important;
+  letter-spacing: 4px;
+}
+
+.manual-label {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.toggle-link {
+  background: none;
+  border: none;
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.toggle-link:hover { color: var(--ink); }
