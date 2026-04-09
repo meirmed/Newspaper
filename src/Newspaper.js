@@ -3,33 +3,12 @@ import './Newspaper.css';
 function downloadNewspaper(formattedDate, language) {
   const el = document.getElementById('newspaper-content');
   if (!el) return;
-
   const isHe = language === 'he';
-  const fonts = `
-    @import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Frank+Ruhl+Libre:wght@400;700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Heebo:wght@400;700;900&display=swap');
-  `;
-
-  const styles = Array.from(document.styleSheets)
-    .map(sheet => {
-      try { return Array.from(sheet.cssRules).map(r => r.cssText).join('\n'); }
-      catch { return ''; }
-    }).join('\n');
-
-  const html = `<!DOCTYPE html>
-<html lang="${isHe ? 'he' : 'en'}" dir="${isHe ? 'rtl' : 'ltr'}">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>The Chronicle of Time — ${formattedDate}</title>
-  <style>${fonts}${styles}
-    body { background: #f5f0e8; margin: 0; padding: 1rem; }
-    .np { max-width: 900px; margin: 0 auto; background: #f5f0e8; }
-    .download-bar { display: none; }
-  </style>
-</head>
-<body>${el.outerHTML}</body>
-</html>`;
-
+  const fonts = `@import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Frank+Ruhl+Libre:wght@400;700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Heebo:wght@400;700;900&display=swap');`;
+  const styles = Array.from(document.styleSheets).map(sheet => {
+    try { return Array.from(sheet.cssRules).map(r => r.cssText).join('\n'); } catch { return ''; }
+  }).join('\n');
+  const html = `<!DOCTYPE html><html lang="${isHe?'he':'en'}" dir="${isHe?'rtl':'ltr'}"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>The Chronicle of Time — ${formattedDate}</title><style>${fonts}${styles} body{background:#f5f0e8;margin:0;padding:1rem;} .np{max-width:900px;margin:0 auto;background:#f5f0e8;} .download-bar{display:none;}</style></head><body>${el.outerHTML}</body></html>`;
   const blob = new Blob([html], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -39,8 +18,34 @@ function downloadNewspaper(formattedDate, language) {
   URL.revokeObjectURL(url);
 }
 
-function printNewspaper() {
-  window.print();
+async function shareNewspaper(formattedDate, language) {
+  const isHe = language === 'he';
+  const shareText = isHe
+    ? `גיליתי מה קרה ב${formattedDate} בהיסטוריה! קרא את העיתון ההיסטורי שלי:`
+    : `Discover what happened on ${formattedDate} in history!`;
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: isHe ? 'דברי הימים — כרוניקת הזמן' : 'The Chronicle of Time',
+        text: shareText,
+        url: window.location.href,
+      });
+    } catch (e) {
+      if (e.name !== 'AbortError') fallbackShare(shareText);
+    }
+  } else {
+    fallbackShare(shareText);
+  }
+}
+
+function fallbackShare(text) {
+  const fullText = `${text} ${window.location.href}`;
+  navigator.clipboard.writeText(fullText).then(() => {
+    alert('Link copied to clipboard!');
+  }).catch(() => {
+    alert(`Share this link: ${window.location.href}`);
+  });
 }
 
 export default function Newspaper({ data, formattedDate, language }) {
@@ -64,10 +69,13 @@ export default function Newspaper({ data, formattedDate, language }) {
   return (
     <>
       <div className="download-bar">
-        <button className="dl-btn" onClick={() => downloadNewspaper(formattedDate, language)} title={isHe ? 'הורד כקובץ' : 'Download'}>
+        <button className="dl-btn dl-btn--share" onClick={() => shareNewspaper(formattedDate, language)}>
+          <span className="dl-icon">↗</span> {isHe ? 'שתף' : 'Share'}
+        </button>
+        <button className="dl-btn" onClick={() => downloadNewspaper(formattedDate, language)}>
           <span className="dl-icon">↓</span> {isHe ? 'הורד' : 'Download'}
         </button>
-        <button className="dl-btn" onClick={printNewspaper} title={isHe ? 'הדפס / שמור כ-PDF' : 'Print / Save as PDF'}>
+        <button className="dl-btn" onClick={() => window.print()}>
           <span className="dl-icon">⎙</span> {isHe ? 'הדפס / PDF' : 'Print / PDF'}
         </button>
       </div>
@@ -80,7 +88,7 @@ export default function Newspaper({ data, formattedDate, language }) {
         </div>
 
         {!isHe && <div className="nameplate-en">The Chronicle of Time</div>}
-        <div className="nameplate-he">{isHe ? "דברי הימים — כרוניקת הזמן" : ""}</div>
+        <div className="nameplate-he">{isHe ? 'דברי הימים — כרוניקת הזמן' : ''}</div>
         <div className="np-tagline">
           {isHe ? '"כל ההיסטוריה הראויה לדפוס"' : '"All the History That\'s Fit to Print"'}
         </div>
@@ -117,9 +125,7 @@ export default function Newspaper({ data, formattedDate, language }) {
 
         <hr className="foot-rule" />
         <div className="foot-txt">
-          {isHe
-            ? 'נדפס על ידי דברי הימים · ההיסטוריה אינה ישנה לעולם'
-            : 'Printed by The Chronicle of Time · History never sleeps'}
+          {isHe ? 'נדפס על ידי דברי הימים · ההיסטוריה אינה ישנה לעולם' : 'Printed by The Chronicle of Time · History never sleeps'}
         </div>
       </div>
     </>
